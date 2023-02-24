@@ -17,7 +17,7 @@ export default async function handler(
     .connect(MONGO_URL as string)
     .catch(err => console.log(err))
 
-  const collection = conn?.connection.db.collection('scraper')
+  const collection = conn?.connection.db.collection('scraper_new')
 
   const { offset, ...filters } = req.query;
   const query = Object.entries(filters).filter(k => !k[0].includes("__") && k[1] !== "").map(([key, value]) => {
@@ -29,8 +29,6 @@ export default async function handler(
     if (ends) return { [key]: new RegExp(`${value}$`, "i") };
     return { [key]: new RegExp(value as string, "i") };
   }).reduce((acc, cur) => ({ ...acc, ...cur } as any), {});
-
-  console.log(query);
 
   const medicines = await collection?.find(query).skip(parseInt(offset as string)).limit(50).toArray()
   const count = await collection?.countDocuments(query) || 0;
