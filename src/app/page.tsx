@@ -10,6 +10,7 @@ export default function Home() {
   const queryTypes = ["contains", "exact", "starts", "ends"]
   const [displayType, setDisplayType] = useState<"grid" | "table">("grid");
   const [displayFilters, setDisplayFilters] = useState(true);
+  const [modalContent, setModalContent] = useState<React.ReactNode>(null);
 
   useEffect(() => {
     const type = localStorage.getItem("displayType");
@@ -124,6 +125,11 @@ export default function Home() {
 
   return (
     <main>
+      {modalContent &&
+        <Modal onClose={() => setModalContent(null)}>
+          {modalContent}
+        </Modal>
+      }
       <h1 className="text-4xl font-black">
         Care Medicine Database
       </h1>
@@ -274,7 +280,7 @@ export default function Home() {
                   <td className="p-2 px-4">{index + 1}</td>
                   {uniqueDataKeys.map((key: any) => (
                     <td key={key} className="p-2 px-4">
-                      {<DataDisplay data={medicine} dataKey={key} />}
+                      {<DataDisplay data={medicine} dataKey={key} setModalContent={setModalContent} />}
                     </td>
                   ))}
                 </tr>
@@ -289,7 +295,7 @@ export default function Home() {
                   {uniqueDataKeys.map((key: any) => (
                     <tr key={key}>
                       <td className="font-bold">{key}</td>
-                      <td><DataDisplay data={medicine} dataKey={key} /></td>
+                      <td><DataDisplay data={medicine} dataKey={key} setModalContent={setModalContent} /></td>
                     </tr>
                   ))}
                 </tbody>
@@ -324,30 +330,44 @@ function Contents(props: { contents: string }) {
   )
 }
 
-const DataDisplay = (props: { data: any, dataKey: any }) => {
-  const { data, dataKey: key } = props;
+const DataDisplay = (props: { data: any, dataKey: any, setModalContent: any }) => {
+  const { data, dataKey: key, setModalContent } = props;
   switch (key) {
     case "contents": {
       return <Contents contents={data[key]} />
     }
     case "dosage_direction_for_use": {
       return (
-        <button className="text-blue-400">
+        <button className="text-blue-400" onClick={() => setModalContent(<div dangerouslySetInnerHTML={{ __html: data[key] }} />)}>
           View Directions
         </button>
       )
     }
     case "company": {
-      return <Link href={data.company_link || ""} className="text-blue-400">{data[key]}</Link>
+      return <Link href={data.company_link || ""} target="_blank" className="text-blue-400">{data[key]}</Link>
     }
     case "cims_class": {
-      return <Link href={data.cims_class_link || ""} className="text-blue-400">{data[key]}</Link>
+      return <Link href={"https://www.mims.com" + data.cims_class_link || ""} target="_blank" className="text-blue-400">{data[key]}</Link>
     }
     case "name": {
-      return <Link href={data.href || ""} className="text-blue-400">{data[key]}</Link>
+      return <Link href={"https://www.mims.com" + data.href || ""} target="_blank" className="text-blue-400">{data[key]}</Link>
     }
     default: {
       return <Contents contents={data[key]} />
     }
   }
+}
+
+const Modal = (props: { children: any, onClose: () => void }) => {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center z-10">
+      <div className="absolute inset-0 bg-black opacity-50 -z-10" onClick={props.onClose}></div>
+      <div className="bg-white relative w-full md:w-[800px] h-full md:h-auto md:max-h-[80vh] overflow-auto rounded-xl p-4 md:p-8">
+        <button className="fixed top-4 right-4 text-2xl" onClick={props.onClose}>
+          X
+        </button>
+        {props.children}
+      </div>
+    </div>
+  )
 }
