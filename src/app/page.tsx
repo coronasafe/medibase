@@ -233,46 +233,47 @@ export default function Home() {
         className="p-2 block w-full text-center bg-gray-100 hover:bg-gray-200 rounded-lg mt-2"
         onClick={() => setDisplayFilters(!displayFilters)}
       >
-        <div className={"inline-block " + (displayFilters ? "-rotate-90" : "rotate-90")}>&gt;</div> {displayFilters ? "Hide" : "Show"} Filters
+        <i className={"fal fa-chevron-right mr-2 " + (displayFilters ? "-rotate-90" : "rotate-90")} /> {displayFilters ? "Hide" : "Show"} Filters
       </button>
       <br />
-      <p>
-        {medicineQuery.data?.pages[0].count || 0} medicines found
-      </p>
-      <br />
-      {medicineQuery.isLoading && (<div>Loading...</div>)}
-
-      <div className="border border-gray-300 rounded-lg p-2 inline-flex items-center gap-2">
-        <button
-          className={`${displayType === "grid" ? "bg-blue-100" : "bg-gray-200"} p-2 px-4 rounded-lg`}
-          onClick={() => {
-            setDisplayType("grid");
-          }}
-        >
-          Grid
-        </button>
-        <button
-          className={`${displayType === "table" ? "bg-blue-100" : "bg-gray-200"} p-2 px-4 rounded-lg`}
-          onClick={() => {
-            setDisplayType("table");
-          }}
-        >
-          Table
-        </button>
+      <div className="flex items-center justify-between">
+        <p>
+          {medicineQuery.data?.pages[0].count || 0} medicines found
+        </p>
+        <div className="border border-gray-100 rounded-lg p-1 inline-flex items-center gap-1">
+          <button
+            className={`${displayType === "grid" ? "bg-blue-100 text-blue-500" : "bg-gray-100 text-black"} w-10 h-10 flex items-center justify-center rounded-md`}
+            onClick={() => {
+              setDisplayType("grid");
+            }}
+          >
+            <i className="fad fa-grid-2" />
+          </button>
+          <button
+            className={`${displayType === "table" ? "bg-blue-100 text-blue-500" : "bg-gray-100 text-black"} w-10 h-10 flex items-center justify-center rounded-lg`}
+            onClick={() => {
+              setDisplayType("table");
+            }}
+          >
+            <i className="fad fa-table" />
+          </button>
+        </div>
       </div>
+
+      {medicineQuery.isLoading && (<div>Loading...</div>)}
       <InfiniteScroll
         dataLength={medicineQuery.data?.pages.flatMap((page) => page.results).length || 0}
         hasMore={medicineQuery.data?.pages[medicineQuery.data.pages.length - 1].has_next || false}
         next={medicineQuery.fetchNextPage}
         loader={<div className="">Loading...</div>}
-        className={`grid grid-cols-1 ${displayType === "grid" ? "md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : ""} gap-5 mt-8`}
+        className={`grid grid-cols-1 ${displayType === "grid" ? "md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3" : ""} gap-5 mt-8`}
       >
         {displayType === "table" ? (
-          <table className="w-full text-sm text-left">
+          <table className="w-full text-sm text-left overflow-hidden rounded-xl">
             <thead className="text-xs uppercase bg-gray-50">
               <tr>
                 {["id", ...uniqueDataKeys].map((key: any) => (
-                  <th scope="col" className="px-6 py-3" key={key}>{key}</th>
+                  <th scope="col" className="px-6 py-3" key={key}>{key.replaceAll("_", " ")}</th>
                 ))}
               </tr>
             </thead>
@@ -291,17 +292,27 @@ export default function Home() {
           </table>
         ) :
           medicineQuery.data?.pages.flatMap((page) => page.results).map((medicine: any, index: number) => (
-            <div key={index} className="border border-gray-200 p-4 rounded-lg">
-              <table>
-                <tbody>
-                  {uniqueDataKeys.map((key: any) => (
-                    <tr key={key}>
-                      <td className="font-bold">{key}</td>
-                      <td><DataDisplay data={medicine} dataKey={key} setModalContent={setModalContent} /></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div key={index} className="border border-gray-300 p-4 rounded-lg">
+              <div className="text-lg font-bold">
+                {medicine.name}
+                <span className="text-sm font-normal ml-2">
+                  {medicine.type}
+                </span>
+              </div>
+              {medicine.company && <div className="">
+                <i className="fal fa-industry-windows" /> {medicine.company}
+              </div>}
+              <br />
+              {uniqueDataKeys.filter(k => !["name", "type", "company"].includes(k as any)).map((key: any) => (
+                <div key={key} className={"mb-2 " + (medicine[key] ? "" : "hidden")}>
+                  <div className="text-xs text-gray-600 italic">
+                    {key.replaceAll("_", " ")}
+                  </div>
+                  <div className="">
+                    <DataDisplay data={medicine} dataKey={key} setModalContent={setModalContent} />
+                  </div>
+                </div>
+              ))}
             </div>
           ))}
       </InfiniteScroll>
