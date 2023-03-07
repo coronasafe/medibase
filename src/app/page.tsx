@@ -108,7 +108,7 @@ export default function Home() {
     }
   }, {
     getNextPageParam: (lastPage, pages) => {
-      return lastPage.has_next ? parseInt(lastPage.offset) + 50 : undefined;
+      return lastPage?.has_next ? parseInt(lastPage.offset) + 50 : undefined;
     },
   });
 
@@ -117,7 +117,7 @@ export default function Home() {
   }, [filters]);
 
   const allDataKeys = medicineQuery.data?.pages.reduce((acc, page) => {
-    return [...acc, ...page.results.map((medicine: any) => Object.keys(medicine)).flat()];
+    return [...acc, ...page?.results.map((medicine: any) => Object.keys(medicine)).flat()];
   }, [] as string[]);
 
   const uniqueAllDataKeys = allDataKeys ? [...new Set(allDataKeys)] : [];
@@ -131,7 +131,7 @@ export default function Home() {
         </Modal>
       }
       <h1 className="text-4xl font-black">
-        Care Medicine Database
+        Medibase
       </h1>
       <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 mt-3" style={{ display: displayFilters ? "grid" : "none" }}>
         {Object.keys(filters).map((key) => {
@@ -141,7 +141,7 @@ export default function Home() {
           switch (filter.type) {
             case "text":
               return (
-                <div className="flex items-stretch border border-gray-400 rounded-lg overflow-hidden relative" key={key}>
+                <div className="flex items-stretch border border-gray-400 rounded-lg relative" key={key}>
                   <select
                     className="bg-gray-200 border-none outline-none px-2 p-1 ring-0"
                     name=""
@@ -168,6 +168,7 @@ export default function Home() {
                     }
                   </select>
                   <AutoCompleteInput
+                    disableAutoComplete={["contents"].includes(key)}
                     key={key}
                     className=" w-full p-1 px-3 outline-none"
                     type="text"
@@ -175,6 +176,7 @@ export default function Home() {
                     id={key}
                     placeholder={key}
                     value={filters[key as keyof typeof filters].value as any}
+                    query={medicineQuery}
                     onChange={(e) => {
                       setFilters({
                         ...filters,
@@ -231,7 +233,7 @@ export default function Home() {
         className="p-2 block w-full text-center bg-gray-100 hover:bg-gray-200 rounded-lg mt-2"
         onClick={() => setDisplayFilters(!displayFilters)}
       >
-        <button className={displayFilters ? "-rotate-90" : "rotate-90"}>&gt;</button> {displayFilters ? "Hide" : "Show"} Filters
+        <div className={"inline-block " + (displayFilters ? "-rotate-90" : "rotate-90")}>&gt;</div> {displayFilters ? "Hide" : "Show"} Filters
       </button>
       <br />
       <p>
@@ -343,15 +345,15 @@ const DataDisplay = (props: { data: any, dataKey: any, setModalContent: any }) =
         </button>
       )
     }
-    case "company": {
-      return <Link href={data.company_link || ""} target="_blank" className="text-blue-400">{data[key]}</Link>
-    }
-    case "cims_class": {
-      return <Link href={"https://www.mims.com" + data.cims_class_link || ""} target="_blank" className="text-blue-400">{data[key]}</Link>
-    }
-    case "name": {
-      return <Link href={"https://www.mims.com" + data.href || ""} target="_blank" className="text-blue-400">{data[key]}</Link>
-    }
+    //case "company": {
+    //  return <Link href={data.company_link || ""} target="_blank" className="text-blue-400">{data[key]}</Link>
+    //}
+    //case "cims_class": {
+    //  return <Link href={"https://www.mims.com" + data.cims_class_link || ""} target="_blank" className="text-blue-400">{data[key]}</Link>
+    //}
+    //case "name": {
+    //  return <Link href={"https://www.mims.com" + data.href || ""} target="_blank" className="text-blue-400">{data[key]}</Link>
+    //}
     default: {
       return <Contents contents={data[key]} />
     }
