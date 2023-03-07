@@ -293,17 +293,20 @@ export default function Home() {
         ) :
           medicineQuery.data?.pages.flatMap((page) => page.results).map((medicine: any, index: number) => (
             <div key={index} className="border border-gray-300 p-4 rounded-lg">
+              <div className="text-sm text-gray-600 italic">
+                {medicine.cims_class}
+              </div>
               <div className="text-lg font-bold">
                 {medicine.name}
                 <span className="text-sm font-normal ml-2">
-                  {medicine.type}
+                  {medicine.generic}
                 </span>
               </div>
               {medicine.company && <div className="">
                 <i className="fal fa-industry-windows" /> {medicine.company}
               </div>}
               <br />
-              {uniqueDataKeys.filter(k => !["name", "type", "company"].includes(k as any)).map((key: any) => (
+              {uniqueDataKeys.filter(k => !["name", "type", "company", "generic", "cims_class"].includes(k as any)).map((key: any) => (
                 <div key={key} className={"mb-2 " + (medicine[key] ? "" : "hidden")}>
                   <div className="text-xs text-gray-600 italic">
                     {key.replaceAll("_", " ")}
