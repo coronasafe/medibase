@@ -293,7 +293,7 @@ export default function Home() {
           </table>
         ) :
           medicineQuery.data?.pages.flatMap((page) => page.results).map((medicine: any, index: number) => (
-            <div key={index} className="border border-gray-300 p-4 rounded-lg bg-gray-50 hover:bg-white cursor-pointer" onClick={() => navigator.clipboard.writeText(medicine._id)}>
+            <div key={index} className="border border-gray-300 p-4 rounded-lg bg-gray-50 hover:bg-white active:border-black cursor-pointer" onClick={() => navigator.clipboard.writeText(medicine._id)}>
               <div className="text-sm text-gray-600 italic">
                 {medicine.cims_class}
               </div>
