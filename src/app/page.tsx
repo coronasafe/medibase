@@ -121,7 +121,7 @@ export default function Home() {
   }, [] as string[]);
 
   const uniqueAllDataKeys = allDataKeys ? [...new Set(allDataKeys)] : [];
-  const uniqueDataKeys = uniqueAllDataKeys.filter((key: any) => !["_id", "company_link", "href", "cims_class_link"].includes(key));
+  const uniqueDataKeys = uniqueAllDataKeys.filter((key: any) => !["company_link", "href", "cims_class_link"].includes(key));
 
   return (
     <main>
@@ -272,15 +272,16 @@ export default function Home() {
           <table className="w-full text-sm text-left overflow-hidden rounded-xl">
             <thead className="text-xs uppercase bg-gray-50">
               <tr>
-                {["id", ...uniqueDataKeys].map((key: any) => (
+                {uniqueDataKeys.map((key: any) => (
                   <th scope="col" className="px-6 py-3" key={key}>{key.replaceAll("_", " ")}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {medicineQuery.data?.pages.flatMap((page) => page.results).map((medicine: any, index: number) => (
-                <tr key={index} className={`${index % 2 === 0 ? "bg-white" : "bg-gray-100"} border-b`}>
-                  <td className="p-2 px-4">{index + 1}</td>
+                <tr key={index} className={`${index % 2 === 0 ? "bg-gray-50" : "bg-gray-100"} hover:bg-white border-b cursor-pointer`}
+                  onClick={() => navigator.clipboard.writeText(medicine._id)}
+                >
                   {uniqueDataKeys.map((key: any) => (
                     <td key={key} className="p-2 px-4">
                       {<DataDisplay data={medicine} dataKey={key} setModalContent={setModalContent} />}
@@ -292,7 +293,7 @@ export default function Home() {
           </table>
         ) :
           medicineQuery.data?.pages.flatMap((page) => page.results).map((medicine: any, index: number) => (
-            <div key={index} className="border border-gray-300 p-4 rounded-lg">
+            <div key={index} className="border border-gray-300 p-4 rounded-lg bg-gray-50 hover:bg-white cursor-pointer" onClick={() => navigator.clipboard.writeText(medicine._id)}>
               <div className="text-sm text-gray-600 italic">
                 {medicine.cims_class}
               </div>
